@@ -1,11 +1,13 @@
 package germen.streamapp.operador.service;
 
+import germen.streamapp.operador.enums.OperationType;
 import germen.streamapp.operador.mapper.OperationMapper;
 import germen.streamapp.operador.model.Operation;
 import germen.streamapp.operador.repository.OperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +30,16 @@ public class OperationService {
     }
 
     public Operation saveOperation(Operation operation){
+
+        operation.setOperationDate(LocalDateTime.now());
+
+        if (operation.getOperationType() == OperationType.RENTA) {
+            operation.setExpirationDate(operation.getOperationDate().plusDays(3));
+        } else {
+            // Si es COMPRA → no expira
+            operation.setExpirationDate(null);
+        }
+
         return operationRepository.save(operation);
     }
 
