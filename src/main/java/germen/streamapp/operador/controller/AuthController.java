@@ -3,7 +3,6 @@ package germen.streamapp.operador.controller;
 import germen.streamapp.operador.DTO.LoginDTO;
 import germen.streamapp.operador.DTO.SignUpDTO;
 import germen.streamapp.operador.model.TokenResponse;
-import germen.streamapp.operador.model.User;
 import germen.streamapp.operador.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +24,7 @@ public class AuthController {
         TokenResponse tokenResponse = authService.signIn(loginDTO);
         return ResponseEntity.ok(tokenResponse);
     }
+
 
     @PostMapping("/signup")
     public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpDTO signUpDTO){

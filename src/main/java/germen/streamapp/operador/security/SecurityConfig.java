@@ -26,28 +26,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .exceptionHandling()
-//                .authenticationEntryPoint(jwtAuthEntryPoint)
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**").permitAll()      // login, signup, refresh
-//                        .requestMatchers("/users/**").authenticated() // rutas protegidas
-//                        .requestMatchers("/operations/**").authenticated() // rutas protegidas
-//                        .anyRequest().authenticated()
-//                );
-////                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-////                .authenticationProvider(authenticationProvider)
-////                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//        return http.build();
         http
-                .csrf(csrf -> csrf.disable()) // en lugar de AbstractHttpConfigurer::disable
+                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -57,8 +37,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-                //.authenticationProvider(authenticationProvider) // importante para DaoAuthProvider
-
         return http.build();
     }
 
