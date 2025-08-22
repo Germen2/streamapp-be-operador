@@ -17,14 +17,28 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private JwtService jwtService;
+
+    @Autowired
     private UserMapper userMapper;
 
     public List<User> getUsers(){
         return userRepository.findAll();
     }
 
-    public Optional<User> getUser(Long id){
+    private Optional<User> getUserWithId(Long id){
         return userRepository.findById(id);
+    }
+
+    public User getUserWithToken(String token){
+        Long userId = jwtService.extractUserId(token);
+        String email = jwtService.extractUsername(token);
+
+        if(!jwtService.isTokenValid(token, email)){
+            throw new RuntimeException("Unauthorized: Invalid token");
+        }
+
+        return getUserWithId(userId).orElseThrow();
     }
 
     public Optional<User> getUserByEmail(String email){

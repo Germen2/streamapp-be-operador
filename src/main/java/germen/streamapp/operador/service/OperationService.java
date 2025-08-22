@@ -1,5 +1,6 @@
 package germen.streamapp.operador.service;
 
+import germen.streamapp.operador.DTO.NewOperationDTO;
 import germen.streamapp.operador.enums.OperationType;
 import germen.streamapp.operador.mapper.OperationMapper;
 import germen.streamapp.operador.model.Operation;
@@ -20,18 +21,38 @@ public class OperationService {
     @Autowired
     private OperationMapper operationMapper;
 
+    @Autowired
+    private JwtService jwtService;
+
 
     public Optional<Operation> getOperation(Long id){
         return operationRepository.findById(id);
     }
 
-    public List<Operation> getUserOperations(Long userId){
+    private List<Operation> getUserOperationsWithUserId(Long userId){
         return operationRepository.findByUserId(userId);
     }
 
-    public Operation saveOperation(Operation operation){
+    public List<Operation> getUserOperations(String token){
+        Long userId = jwtService.extractUserId(token);
+        String email = jwtService.extractUsername(token);
 
+        if(!jwtService.isTokenValid(token, email)){
+            return null;
+        }
+
+        return getUserOperationsWithUserId(userId);
+    }
+
+    public Operation saveOperation(NewOperationDTO newOperationDTO, String token){
+
+        Operation operation = new Operation();
+        operation.setOperationType(newOperationDTO.getOperationType());
+        operation.setMovieId(newOperationDTO.getMovieId());
         operation.setOperationDate(LocalDateTime.now());
+
+        Long userId = jwtService.extractUserId(token);
+        operation.setUserId(userId);
 
         if (operation.getOperationType() == OperationType.RENTA) {
             operation.setExpirationDate(operation.getOperationDate().plusDays(3));

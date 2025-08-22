@@ -16,6 +16,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -47,7 +48,7 @@ public class JwtService {
         return Jwts.builder()
                 .id(user.getId().toString())
                 .subject(user.getEmail())
-                .claims(Map.of("firstName", user.getFirstName(), "lastName", user.getLastName()))
+                .claims(Map.of("firstName", user.getFirstName(), "lastName", user.getLastName(), "id", user.getId()))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
@@ -62,6 +63,10 @@ public class JwtService {
     // Extraer email del token
     public String extractUsername(String token){
         return extractAllClaims(token).getSubject();
+    }
+
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("id", Long.class));
     }
 
     // Validar token
@@ -81,6 +86,11 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
     // Obtener token de la BD

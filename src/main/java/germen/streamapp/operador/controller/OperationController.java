@@ -1,8 +1,11 @@
 package germen.streamapp.operador.controller;
 
+import germen.streamapp.operador.DTO.NewOperationDTO;
 import germen.streamapp.operador.model.Operation;
 import germen.streamapp.operador.service.OperationService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +18,22 @@ public class OperationController {
     @Autowired
     private OperationService operationService;
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Operation>> getUserOperations(@PathVariable Long userId) {
-        List<Operation> operations = operationService.getUserOperations(userId);
+//    @GetMapping("/user/{userId}")
+//    public ResponseEntity<List<Operation>> getUserOperations(@PathVariable Long userId) {
+//        List<Operation> operations = operationService.getUserOperations(userId);
+//        return ResponseEntity.ok(operations);
+//    }
+    @PostMapping("/useroperations")
+    public ResponseEntity<List<Operation>> getUserOperations(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authHeader.substring(7);
+
+        List<Operation> operations = operationService.getUserOperations(token);
         return ResponseEntity.ok(operations);
     }
 
@@ -29,8 +45,15 @@ public class OperationController {
 
     // POST /operations → crear una nueva operacion
     @PostMapping
-    public ResponseEntity<Operation> addOperation(@RequestBody Operation operation) {
-        Operation saved = operationService.saveOperation(operation);
+    public ResponseEntity<Operation> addOperation(@RequestBody NewOperationDTO newOperationDTO, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authHeader.substring(7);
+        Operation saved = operationService.saveOperation(newOperationDTO, token);
         return ResponseEntity.status(201).body(saved); // 201 Created
     }
 

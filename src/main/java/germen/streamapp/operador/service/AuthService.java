@@ -114,4 +114,13 @@ public class AuthService {
 
         return tokenResponse;
     }
+
+    public Boolean isTokenValid(String token){
+        String email = jwtService.extractUsername(token);
+        return jwtService.isTokenValid(token, email);
+    }
+
+    public User getUserFromToken(String token){
+        return userService.getUserWithToken(token);
+    }
 }

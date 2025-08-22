@@ -1,9 +1,12 @@
 package germen.streamapp.operador.controller;
 
 import germen.streamapp.operador.DTO.SignUpDTO;
+import germen.streamapp.operador.model.Operation;
 import germen.streamapp.operador.model.User;
 import germen.streamapp.operador.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +27,41 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    // ✅ GET /users/{id} → obtener un usuario por id
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        Optional<User> user = userService.getUser(id);
-        return ResponseEntity.of(user); // devuelve 200 OK o 404 Not Found
+//    // ✅ GET /users/{id} → obtener un usuario por id
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUser(@PathVariable Long id) {
+//        Optional<User> user = userService.get(id);
+//        return ResponseEntity.of(user); // devuelve 200 OK o 404 Not Found
+//    }
+
+//    @PostMapping("/user")
+//    public ResponseEntity<User> getUserOperations(HttpServletRequest request){
+//        String authHeader = request.getHeader("Authorization");
+//
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        String token = authHeader.substring(7);
+//
+//        Optional<User> optionalUser = userService.getUserWithToken(token);
+//
+//        return optionalUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+//
+//    }
+
+    @PostMapping("/user")
+    public User getUser(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        String token = authHeader.substring(7);
+
+        return userService.getUserWithToken(token);
+
     }
 
     // ✅ POST /users → crear un nuevo usuario
